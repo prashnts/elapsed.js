@@ -1,9 +1,46 @@
+/**
+ * Elapsed.JS
+ * Converts boring Timestamps to something like:
+ * "just now", "a few minutes ago", "3 minutes ago" etc.
+ * License- 
+ * @package: TwoDot7 <https://github.com/PrashntS/TwoDot7>
+ * @author: Prashant Sinha <firstname,lastname>@outlook.com, <firstname>@ducic.ac.in
+ * @organization: Cluster Innovation Centre, University of Delhi
+ * @version: v1.0 20140915
+ * @link: https://github.com/PrashntS/elapsed.js
+ */
 var Elapsed = {
+
+	/**
+	 * Package initiator.
+	 */
 	ClassHook: "elapsedJS",
+
+	/**
+	 * HTML5 Standard data container.
+	 */
 	DataHook: "data-elapseJS",
+
+	/**
+	 * Prevents Multiple runtimes.
+	 */
 	ActionToggle: false,
+
+	/**
+	 * Time interval between routine calls. See Routine.
+	 */
 	RoutineInterval: 1000,
-	ElapsedDEBUG: true,
+
+	/**
+	 * Enables Debugging Mode.
+	 */
+	ElapsedDEBUG: false,
+
+	/**
+	 * Main Action. Iterates through ALL elapse elements and converts them into Elapse Objects.
+	 * @param: none.
+	 * @return: none.
+	 */
 	action: function() {
 		if(Elapsed.ActionToggle) {
 			Elapsed.debugMsg("ElapsedJS action is Locked.");
@@ -19,7 +56,7 @@ var Elapsed = {
 			var Elapse = Elapses[i];
 		
 			try {
-				var pastTime = parseInt(Elapse.getAttribute("data-elapseJS"));
+				var pastTime = parseInt(Elapse.getAttribute(Elapsed.DataHook));
 				var past = new Date(pastTime*1000);
 
 				var now = new Date();
@@ -48,6 +85,14 @@ var Elapsed = {
 			}
 		}
 	},
+
+	/**
+	 * Returns the Prettified Date, according to given .NET style date-time format. 
+	 * @param: date Date Object, Required. Date Object.
+	 * @param: format String, Required. .NET Style date-time format.
+	 * @param: utc Integer, Optional. Optional UTC offset. Default- System default.
+	 * @return: string. The Date-Time formatted string.
+	 */
 	formatDate: function(date, format, utc) {
 		var MMMM = ["\x00", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		var MMM = ["\x01", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -130,16 +175,34 @@ var Elapsed = {
 
 		return format;
 	},
+
+	/**
+	 * If ElapsedDEBUG is true, logs all the Debug data to the console.
+	 * @param: message, String Required. The Message.
+	 * @return: none.
+	 */
 	debugMsg: function(message) {
 		if (Elapsed.ElapsedDEBUG) {
 			console.log("ElapsedJS DEBUG: "+message);
 		}
 	},
+
+	/**
+	 * Starts the Elapsed Job, and inits the Routine Job.
+	 * @param: none.
+	 * @return: none.
+	 */
 	init: function() {
 		Elapsed.action();
 		Elapsed.routine();
 		Elapsed.debugMsg("Initialized ElapsedJS.");
 	},
+
+	/**
+	 * Repeats the Action depending on RoutineInterval.
+	 * @param: none.
+	 * @return: none.
+	 */
 	routine: function() {
 		window.setInterval(function() {
 			Elapsed.debugMsg("Routine Called.");
