@@ -3,16 +3,52 @@ var Elapsed = {
 	DataHook: "data-elapseJS",
 	ActionToggle: false,
 	RoutineInterval: 1000,
-	init: function() {
-		Elapsed.action();
-		Elapsed.routine();
+	ElapsedDEBUG: true,
+	action: function() {
+		if(Elapsed.ActionToggle) {
+			Elapsed.debugMsg("ElapsedJS action is Locked.");
+			return;
+		}
+		Elapsed.ActionToggle = true;
+		Elapsed.debugMsg("Locked ElapsedJS action.");
+
+		Elapses = document.getElementsByClassName(Elapsed.ClassHook);
+		
+		for (var i = 0; i < Elapses.length; i++) {
+		
+			var Elapse = Elapses[i];
+		
+			try {
+				var pastTime = parseInt(Elapse.getAttribute("data-elapseJS"));
+				var past = new Date(pastTime*1000);
+
+				var now = new Date();
+				var timeNow = parseInt(now.getTime()/1000);
+
+				var ago = timeNow - pastTime;
+
+				putTime = function(message) {
+					Elapse.innerHTML = message;
+				};
+
+				if (ago < 60) putTime("just now");
+				else if (ago < 120) putTime("a few minutes ago");
+				else if (ago < 3570) putTime(parseInt(ago/60)+" minutes ago");
+				else if (ago < 86400) putTime("today, at "+Elapsed.formatDate(past, "h:mmTT"));
+				else if (ago < 172800) putTime("yesterday, at "+Elapsed.formatDate(past, "h:mmTT"));
+				else putTime(Elapsed.formatDate(past, "h:mmTT, d MMMM yyyy"));
+
+			} catch (E) {
+				Elapsed.debugMsg(E.message);
+			}
+
+			if (i+1 == Elapses.length) {
+				Elapsed.ActionToggle = false;
+				Elapsed.debugMsg("Unlocked ElapsedJS action.");
+			}
+		}
 	},
-	routine: function() {
-		window.setInterval(function() {
-			Elapsed.action();
-		}, Elapsed.RoutineInterval);
-	},
-	formatDate: function (date, format, utc) {
+	formatDate: function(date, format, utc) {
 		var MMMM = ["\x00", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		var MMM = ["\x01", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 		var dddd = ["\x02", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -94,43 +130,20 @@ var Elapsed = {
 
 		return format;
 	},
-	action: function() {
-		if(Elapsed.ActionToggle) return;
-		Elapsed.ActionToggle = true;
-
-		Elapses = document.getElementsByClassName(Elapsed.ClassHook);
-		
-		for (var i = 0; i < Elapses.length; i++) {
-		
-			var Elapse = Elapses[i];
-		
-			try {
-				var pastTime = parseInt(Elapse.getAttribute("data-elapseJS"));
-				var past = new Date(pastTime*1000);
-
-				var now = new Date();
-				var timeNow = parseInt(now.getTime()/1000);
-
-				var ago = timeNow - pastTime;
-
-				putTime = function(message) {
-					Elapse.innerHTML = message;
-				};
-
-				if (ago < 60) putTime("just now");
-				else if (ago < 120) putTime("a few minutes ago");
-				else if (ago < 3570) putTime(parseInt(ago/60)+" minutes ago");
-				else if (ago < 86400) putTime("today, at "+Elapsed.formatDate(past, "h:mmTT"));
-				else if (ago < 172800) putTime("yesterday, at "+Elapsed.formatDate(past, "h:mmTT"));
-				else putTime(Elapsed.formatDate(past, "h:mmTT, d MMMM yyyy"));
-
-			} catch (E) {
-				console.log("ElapsedJS ERROR: "+E.errorMsg)
-			}
-
-			if (i-1 == Elapses.length) {
-				Elapsed.ActionToggle = false;
-			}
+	debugMsg: function(message) {
+		if (Elapsed.ElapsedDEBUG) {
+			console.log("ElapsedJS DEBUG: "+message);
 		}
+	},
+	init: function() {
+		Elapsed.action();
+		Elapsed.routine();
+		Elapsed.debugMsg("Initialized ElapsedJS.");
+	},
+	routine: function() {
+		window.setInterval(function() {
+			Elapsed.debugMsg("Routine Called.");
+			Elapsed.action();
+		}, Elapsed.RoutineInterval);
 	}
-}
+};
