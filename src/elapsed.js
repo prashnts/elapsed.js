@@ -1,11 +1,16 @@
 var Elapsed = {
 	ClassHook: "elapsedJS",
 	DataHook: "data-elapseJS",
+	ActionToggle: false,
+	RoutineInterval: 1000,
 	init: function() {
-		//
+		Elapsed.action();
+		Elapsed.routine();
 	},
 	routine: function() {
-		//
+		window.setInterval(function() {
+			Elapsed.action();
+		}, Elapsed.RoutineInterval);
 	},
 	formatDate: function (date, format, utc) {
 		var MMMM = ["\x00", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -90,9 +95,15 @@ var Elapsed = {
 		return format;
 	},
 	action: function() {
+		if(Elapsed.ActionToggle) return;
+		Elapsed.ActionToggle = true;
+
 		Elapses = document.getElementsByClassName(Elapsed.ClassHook);
+		
 		for (var i = 0; i < Elapses.length; i++) {
+		
 			var Elapse = Elapses[i];
+		
 			try {
 				var pastTime = parseInt(Elapse.getAttribute("data-elapseJS"));
 				var past = new Date(pastTime*1000);
@@ -101,8 +112,6 @@ var Elapsed = {
 				var timeNow = parseInt(now.getTime()/1000);
 
 				var ago = timeNow - pastTime;
-
-				console.log(ago);
 
 				putTime = function(message) {
 					Elapse.innerHTML = message;
@@ -119,6 +128,9 @@ var Elapsed = {
 				console.log("ElapsedJS ERROR: "+E.errorMsg)
 			}
 
-		};
+			if (i-1 == Elapses.length) {
+				Elapsed.ActionToggle = false;
+			}
+		}
 	}
 }
